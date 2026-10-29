@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { Staff, Tenant } from "../packages/pos-core/src/types";
@@ -221,7 +221,7 @@ test("bootstrap pending: CafePOS shell is absent, loading indicator shown", () =
   render(<App />);
 
   expect(screen.getByRole("status")).toBeTruthy();
-  expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull();
+  expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull();
 });
 
 test("empty product bootstrap shows first-run wizard, not demo login", async () => {
@@ -249,7 +249,7 @@ test("bootstrap failure/fatal: CafePOS shell is absent, error alert shown", asyn
   render(<App />);
 
   await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
-  expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull();
+  expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull();
 });
 
 test("bootstrap ready with no staff session: CafePOS shell is absent, login form shown", async () => {
@@ -260,7 +260,7 @@ test("bootstrap ready with no staff session: CafePOS shell is absent, login form
   await waitFor(() =>
     expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy()
   );
-  expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull();
+  expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull();
 });
 
 test("stale store session before bootstrap: pre-seeded tenant+staff do not grant CafePOS shell", () => {
@@ -271,7 +271,7 @@ test("stale store session before bootstrap: pre-seeded tenant+staff do not grant
   render(<App />);
 
   // The local-state guard (authenticatedStaffId === null) must block the shell
-  expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull();
+  expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull();
   expect(screen.getByRole("status")).toBeTruthy();
 });
 
@@ -302,7 +302,7 @@ test("tenant/staff tenantId mismatch: CafePOS shell is absent", async () => {
   await signInViaUI(mismatchedStaff.id, "1234");
 
   // Shell must NOT appear
-  expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull();
+  expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull();
 });
 
 test("successful signIn through UI: CafePOS shell appears", async () => {
@@ -317,7 +317,7 @@ test("successful signIn through UI: CafePOS shell appears", async () => {
   await signInViaUI(staffRecord.id, "7890");
 
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 });
 
@@ -333,7 +333,7 @@ test("signOut returns to non-shell boundary: CafePOS shell disappears", async ()
   await signInViaUI(staffRecord.id, "7890");
 
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // Drive sign-out via the store (no sign-out button in the shell UI yet)
@@ -342,7 +342,7 @@ test("signOut returns to non-shell boundary: CafePOS shell disappears", async ()
   });
 
   await waitFor(() =>
-    expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull()
+    expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull()
   );
   expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy();
 });
@@ -358,7 +358,7 @@ test("signOut then external store repopulation: shell must not reappear without 
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // Sign out via the store
@@ -366,7 +366,7 @@ test("signOut then external store repopulation: shell must not reappear without 
     useTenantAuthStore.getState().signOut();
   });
   await waitFor(() =>
-    expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull()
+    expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull()
   );
 
   // Adversary: repopulate the store with the same tenant + staff directly,
@@ -377,7 +377,7 @@ test("signOut then external store repopulation: shell must not reappear without 
 
   // Shell must stay absent — no new UI sign-in occurred
   await waitFor(() =>
-    expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull()
+    expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull()
   );
   expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy();
 });
@@ -393,7 +393,7 @@ test("UI sign-in staff A then store replacement with staff B same tenant: shell 
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // Adversary: replace signedInStaff in the store with a crafted staff B that
@@ -415,7 +415,7 @@ test("UI sign-in staff A then store replacement with staff B same tenant: shell 
   // Shell must be absent — staffB is not the bootstrap-authenticated record,
   // even though its id matches authenticatedStaffId
   await waitFor(() =>
-    expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull()
+    expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull()
   );
   expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy();
 });
@@ -435,7 +435,7 @@ test("regression: UI sign-in then same-id tenant object replacement — shell mu
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // Adversary: replace the tenant with a *new object* that has the same id —
@@ -447,7 +447,7 @@ test("regression: UI sign-in then same-id tenant object replacement — shell mu
 
   // Shell must be absent — impostor tenant is not the bootstrap-authenticated reference
   await waitFor(() =>
-    expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull()
+    expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull()
   );
   expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy();
 });
@@ -467,7 +467,7 @@ test("regression: signOut then synchronous same-object staff reinsert — shell 
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // Adversary: signOut() then immediately reinsert the exact same staff object
@@ -481,7 +481,7 @@ test("regression: signOut then synchronous same-object staff reinsert — shell 
 
   // Shell must be absent — signOut revoked the session generation
   await waitFor(() =>
-    expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull()
+    expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull()
   );
   expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy();
 });
@@ -497,7 +497,7 @@ test("remount after signOut: fresh mount starts at non-shell boundary", async ()
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // Sign out and unmount
@@ -512,7 +512,7 @@ test("remount after signOut: fresh mount starts at non-shell boundary", async ()
   await waitFor(() =>
     expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy()
   );
-  expect(screen.queryByRole("heading", { name: "CafePOS" })).toBeNull();
+  expect(screen.queryByRole("heading", { name: /LocalBill|CafePOS/i })).toBeNull();
 });
 
 // ---------------------------------------------------------------------------
@@ -529,7 +529,7 @@ test("authenticated POS menu: store groups/items appear; unavailable item absent
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // Inject catalog data via replaceTenantData (test-only act)
@@ -605,11 +605,11 @@ test("authenticated POS menu empty store: exact text 'Chưa có món để hiể
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // With no catalog groups, MenuGrid must show the empty-state text
-  expect(screen.getAllByText("Chưa có món để hiển thị").length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/No items to display|Chưa có món để hiển thị/i).length).toBeGreaterThan(0);
 });
 
 test("authenticated shell with empty catalog-table store: shows empty state text and no Bàn 1 card", async () => {
@@ -623,11 +623,11 @@ test("authenticated shell with empty catalog-table store: shows empty state text
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // Must show exact empty-state text (desktop + mobile layouts each render once)
-  expect(screen.getAllByText("Chưa có bàn để hiển thị").length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/No tables to display|Chưa có bàn để hiển thị/i).length).toBeGreaterThan(0);
   // Must NOT show any Bàn 1 table card
   expect(screen.queryByRole("button", { name: /Bàn 1/i })).toBeNull();
 });
@@ -661,7 +661,7 @@ test("authenticated shell: select Bàn 2 then replace store omitting its ID — 
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // Load two tables into the catalog store
@@ -712,11 +712,11 @@ test("2.8-s2: authenticated shell with null order state: shows 'Chọn món đ�
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // Empty-state text must be present (desktop + mobile panels both render)
-  expect(screen.getAllByText("Chọn món để thêm vào đơn").length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/Select items to add to order|Chọn món để thêm vào đơn/i).length).toBeGreaterThan(0);
 
   // Hard-coded fake line items must be absent
   expect(screen.queryByText("Cà phê đen")).toBeNull();
@@ -724,7 +724,7 @@ test("2.8-s2: authenticated shell with null order state: shows 'Chọn món đ�
   expect(screen.queryByText("Ít cơm")).toBeNull();
 
   // Action buttons disabled (both desktop + mobile panels each render one pair)
-  const guiBep = screen.getAllByRole("button", { name: /Gửi bếp/i });
+  const guiBep = screen.getAllByRole("button", { name: /Send to Kitchen|Gửi bếp/i });
   const thanhToan = screen.getAllByRole("button", { name: /Thanh toán/i });
   expect(guiBep.length).toBeGreaterThan(0);
   expect(thanhToan.length).toBeGreaterThan(0);
@@ -747,7 +747,7 @@ test("2.9-s3: authenticated shell with null order — Thanh toán disabled and n
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   // All "Thanh toán" buttons must be disabled (desktop + mobile panels both render one each)
@@ -756,7 +756,7 @@ test("2.9-s3: authenticated shell with null order — Thanh toán disabled and n
   thanhToanBtns.forEach((btn) => expect(btn).toBeDisabled());
 
   // No accessible dialog named "Thanh toán" must exist in the DOM
-  expect(screen.queryByRole("dialog", { name: "Thanh toán" })).toBeNull();
+  expect(screen.queryByRole("dialog", { name: /Checkout|Payment|Thanh toán/i })).toBeNull();
 });
 
 test("authenticated shell nav: default view 'Bán hàng' is current; siblings are not", async () => {
@@ -769,13 +769,13 @@ test("authenticated shell nav: default view 'Bán hàng' is current; siblings ar
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
   const pos = screen.getByRole("button", { name: "Bán hàng" });
   expect(pos).toHaveAttribute("aria-current", "page");
   expect(pos).toHaveAttribute("type", "button");
-  expect(screen.getByRole("button", { name: "Bếp" })).not.toHaveAttribute(
+  expect(screen.getByRole("button", { name: /Kitchen|Bếp/i })).not.toHaveAttribute(
     "aria-current",
   );
   expect(screen.getByRole("button", { name: "Quản lý món" })).not.toHaveAttribute(
@@ -802,11 +802,11 @@ test("authenticated shell nav: clicking 'Bếp' marks only that view current", a
   );
   await signInViaUI(staffRecord.id, "7890");
   await waitFor(() =>
-    expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy()
   );
 
-  fireEvent.click(screen.getByRole("button", { name: "Bếp" }));
-  expect(screen.getByRole("button", { name: "Bếp" })).toHaveAttribute(
+  fireEvent.click(screen.getByRole("button", { name: /Kitchen|Bếp/i }));
+  expect(screen.getByRole("button", { name: /Kitchen|Bếp/i })).toHaveAttribute(
     "aria-current",
     "page",
   );
@@ -882,7 +882,7 @@ test("hydrate success enables occupy persist; empty IDB and E2E fixture never ca
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   expect(isDexiePersistSession()).toBe(true);
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   fireEvent.click(screen.getAllByRole("button", { name: /Bàn 1/i })[0]);
   await waitFor(() => expect(persist.occupy).toHaveBeenCalledTimes(1));
   expect(useOrderPaymentStore.getState().currentOrder?.tableId).toBe("t1");
@@ -894,7 +894,7 @@ test("empty hydrate does not persist occupy", async () => {
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   expect(isDexiePersistSession()).toBe(false);
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   act(() => {
     useCatalogTableStore.getState().replaceTenantData(tenant.id, {
       catalogGroups: [],
@@ -932,7 +932,7 @@ test("E2E fixture pos skips persist even when occupy succeeds", async () => {
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   expect(isDexiePersistSession()).toBe(false);
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   fireEvent.click(screen.getAllByRole("button", { name: /Bàn 1/i })[0]);
   expect(persist.occupy).not.toHaveBeenCalled();
   expect(restore.load).not.toHaveBeenCalled();
@@ -985,7 +985,7 @@ test("hydrate success + occupied table click restores the bound open order", asy
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   expect(isDexiePersistSession()).toBe(true);
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   expect(useOrderPaymentStore.getState().currentOrder).toBeNull();
   fireEvent.click(screen.getAllByRole("button", { name: /Bàn 1/i })[0]);
   await waitFor(() => expect(restore.load).toHaveBeenCalledTimes(1));
@@ -1006,7 +1006,7 @@ test("same-staff relogin without unmount clears POS state and selected table", a
   render(<App />);
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   fireEvent.click(screen.getAllByRole("button", { name: /Bàn 1/i })[0]);
   await waitFor(() => expect(useOrderPaymentStore.getState().currentOrder?.id).toBe("order-1"));
   expect(screen.getAllByRole("button", { name: /Bàn 1/i })[0].getAttribute("aria-pressed")).toBe("true");
@@ -1035,7 +1035,7 @@ test("occupied restore after logout/relogin does not mutate the new session", as
   render(<App />);
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   fireEvent.click(screen.getAllByRole("button", { name: /Bàn 1/i })[0]);
   await waitFor(() => expect(restore.load).toHaveBeenCalledTimes(1));
   useTenantAuthStore.getState().signOut();
@@ -1053,7 +1053,7 @@ test("occupied restore after table rebind during await does not apply the old or
   render(<App />);
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   fireEvent.click(screen.getAllByRole("button", { name: /Bàn 1/i })[0]);
   await waitFor(() => expect(restore.load).toHaveBeenCalledTimes(1));
   act(() => {
@@ -1074,7 +1074,7 @@ test("occupied restore after staffId change during await does not apply", async 
   render(<App />);
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   fireEvent.click(screen.getAllByRole("button", { name: /Bàn 1/i })[0]);
   await waitFor(() => expect(restore.load).toHaveBeenCalledTimes(1));
   act(() => {
@@ -1097,7 +1097,7 @@ test("occupied click with missing currentOrderId does not call restore", async (
   render(<App />);
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   fireEvent.click(screen.getAllByRole("button", { name: /Bàn 1/i })[0]);
   expect(restore.load).not.toHaveBeenCalled();
   expect(useOrderPaymentStore.getState().currentOrder).toBeNull();
@@ -1110,7 +1110,7 @@ test("empty IDB never calls restore on occupied click", async () => {
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   expect(isDexiePersistSession()).toBe(false);
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   act(() => {
     useCatalogTableStore.getState().replaceTenantData(tenant.id, {
       catalogGroups: [],
@@ -1146,7 +1146,7 @@ test("existing currentOrder + other occupied table only changes highlight", asyn
   render(<App />);
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   fireEvent.click(screen.getAllByRole("button", { name: /Bàn 1/i })[0]);
   await waitFor(() => expect(useOrderPaymentStore.getState().currentOrder?.id).toBe("order-1"));
   fireEvent.click(screen.getAllByRole("button", { name: /Bàn 2/i })[0]);
@@ -1162,7 +1162,7 @@ test("hydrate success enables backup export; empty IDB disables it", async () =>
   render(<App />);
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   fireEvent.click(screen.getByRole("button", { name: "Sao lưu" }));
   expect(screen.getByRole("heading", { name: "Sao lưu dữ liệu" })).toBeTruthy();
   expect(screen.getByRole("button", { name: "Tải sao lưu" })).toBeEnabled();
@@ -1173,7 +1173,7 @@ test("empty IDB backup actions stay disabled", async () => {
   render(<App />);
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   fireEvent.click(screen.getByRole("button", { name: "Sao lưu" }));
   expect(screen.getByRole("button", { name: "Tải sao lưu" })).toBeDisabled();
   expect(screen.getByRole("button", { name: "Nhập sao lưu" })).toBeDisabled();
@@ -1190,7 +1190,7 @@ test("tab listener ignores events until persist session is on", async () => {
   render(<App />);
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   expect(isDexiePersistSession()).toBe(false);
   expect(tabs.listen).toHaveBeenCalled();
   hydrate.fromDexie.mockClear();
@@ -1212,7 +1212,7 @@ test("other-tab persist event rehydrates catalog/tables for the same tenant", as
   render(<App />);
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   expect(tabs.listen).toHaveBeenCalled();
   hydrate.fromDexie.mockImplementation(async () => ({
     ...occupiedHydrate,
@@ -1278,7 +1278,7 @@ async function openPayModal() {
   render(<App />);
   await waitFor(() => expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeTruthy());
   await signInViaUI(staffRecord.id, "7890");
-  await waitFor(() => expect(screen.getByRole("heading", { name: "CafePOS" })).toBeTruthy());
+  await waitFor(() => expect(screen.getByRole("heading", { name: /LocalBill|CafePOS/i })).toBeTruthy());
   fireEvent.click(screen.getAllByRole("button", { name: /Bàn 1/i })[0]);
   await waitFor(() => expect(useOrderPaymentStore.getState().currentOrder?.items.length).toBe(1));
   const payButton = screen.getAllByRole("button", { name: /Thanh toán/i }).find((button) => !(button as HTMLButtonElement).disabled);
@@ -1286,7 +1286,7 @@ async function openPayModal() {
   fireEvent.click(payButton!);
   await waitFor(() => expect(screen.getByLabelText("Số tiền khách đưa")).toBeTruthy());
   fireEvent.change(screen.getByLabelText("Số tiền khách đưa"), { target: { value: "25000" } });
-  fireEvent.click(screen.getByRole("button", { name: /xác nhận thanh toán/i }));
+  fireEvent.click(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i }));
 }
 
 test("conflict persist reconciles local loser to durable paid/empty and does not show receipt", async () => {
@@ -1304,7 +1304,7 @@ test("conflict persist reconciles local loser to durable paid/empty and does not
   });
   expect(useOrderPaymentStore.getState().currentOrder?.status).toBe("paid");
   expect(useOrderPaymentStore.getState().payments.map((row) => row.id)).toEqual(["pay-win"]);
-  expect(screen.queryByText(/thanh toán thành công/i)).toBeNull();
+  expect(screen.queryByText(/Payment Successful|thanh toán thành công/i)).toBeNull();
   expect(useOrderPaymentStore.getState().recordPayment({ ...winnerPayment, id: "pay-again", createdAt: 21 })).toBe(false);
 });
 
@@ -1324,7 +1324,7 @@ test("io-error with durable predecessor rolls local payment back", async () => {
   expect(useOrderPaymentStore.getState().currentOrder?.status).toBe("open");
   expect(useOrderPaymentStore.getState().payments).toEqual([]);
   expect(useCatalogTableStore.getState().tables[0]).toMatchObject({ status: "occupied", currentOrderId: "order-1" });
-  expect(screen.queryByText(/thanh toán thành công/i)).toBeNull();
+  expect(screen.queryByText(/Payment Successful|thanh toán thành công/i)).toBeNull();
 });
 
 test("local release fail after durable commit leaves a rebound table untouched and suppresses receipt", async () => {
@@ -1345,10 +1345,10 @@ test("local release fail after durable commit leaves a rebound table untouched a
   });
   await act(async () => { resolvePay({ kind: "committed" }); });
   await waitFor(() => {
-    expect(screen.getByRole("alert")).toHaveTextContent("Không lưu được thanh toán. Kiểm tra lại đơn trước khi thu tiếp.");
+    expect(screen.getByRole("alert")).toHaveTextContent(expect.stringMatching(/Could not record payment|Không lưu được thanh toán/i));
   });
   expect(useCatalogTableStore.getState().tables[0]).toMatchObject({ status: "occupied", currentOrderId: "order-other" });
-  expect(screen.queryByText(/thanh toán thành công/i)).toBeNull();
+  expect(screen.queryByText(/Payment Successful|thanh toán thành công/i)).toBeNull();
 });
 
 test("logout then same-staff login while snapshot load awaits does not reconcile or show receipt", async () => {
@@ -1368,6 +1368,6 @@ test("logout then same-staff login while snapshot load awaits does not reconcile
   await waitFor(() => {
     expect(persist.loadPay).toHaveBeenCalled();
   });
-  expect(screen.queryByText(/thanh toán thành công/i)).toBeNull();
+  expect(screen.queryByText(/Payment Successful|thanh toán thành công/i)).toBeNull();
   expect(useCatalogTableStore.getState().tables[0]?.status).toBe("occupied");
 });

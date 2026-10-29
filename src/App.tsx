@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { bootstrapDemoPos } from "@/pos/demo-pos-bootstrap";
 import type { DemoPosBootstrap } from "@/pos/demo-pos-bootstrap";
 import { loadProductBootstrap } from "@/pos/product-bootstrap";
@@ -32,7 +32,7 @@ import {
   Download,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import { t } from "@/lib/i18n";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MenuGrid } from "@/components/pos/MenuGrid";
 import { MenuManagement } from "@/components/pos/MenuManagement";
@@ -44,12 +44,12 @@ import { TableMap } from "@/components/pos/TableMap";
 import { OrderPanel } from "@/components/pos/OrderPanel";
 
 const VIEWS = [
-  { id: "pos", name: "Bán hàng", icon: LayoutGrid },
-  { id: "kitchen", name: "Bếp", icon: ChefHat },
-  { id: "menu", name: "Quản lý món", icon: BookOpen },
-  { id: "report", name: "Báo cáo", icon: BarChart3 },
-  { id: "staff", name: "Nhân sự", icon: Users },
-  { id: "backup", name: "Sao lưu", icon: Download },
+  { id: "pos", name: t.nav.pos, icon: LayoutGrid },
+  { id: "kitchen", name: t.nav.kitchen, icon: ChefHat },
+  { id: "menu", name: t.nav.menu, icon: BookOpen },
+  { id: "report", name: t.nav.report, icon: BarChart3 },
+  { id: "staff", name: t.nav.staff, icon: Users },
+  { id: "backup", name: t.nav.backup, icon: Download },
 ] as const;
 
 type ViewId = (typeof VIEWS)[number]["id"];
@@ -288,15 +288,15 @@ function PosShell() {
   const tablesPanel = (
     <div className="flex h-full flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-foreground">Danh sách bàn</h2>
+        <h2 className="text-lg font-bold text-foreground">{t.tables.heading}</h2>
         <div className="flex gap-2 text-xs">
           <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-1 text-success-foreground">
             <span className="h-2 w-2 rounded-full bg-success" />
-            Trống
+            {t.tables.statusEmpty}
           </span>
           <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-1 text-primary-foreground">
             <span className="h-2 w-2 rounded-full bg-primary" />
-            Có khách
+            {t.tables.statusOccupied}
           </span>
         </div>
       </div>
@@ -324,10 +324,10 @@ function PosShell() {
           </div>
           <div>
             <h1 className="text-base font-bold leading-tight text-card-foreground sm:text-lg">
-              CafePOS
+              {t.app.name}
             </h1>
             <p className="text-[10px] text-muted-foreground sm:text-xs">
-              Quán ăn · Cafe nhỏ
+              {t.app.tagline}
             </p>
           </div>
         </div>
@@ -385,14 +385,10 @@ function PosShell() {
           <main className="flex flex-1 flex-col overflow-hidden p-3 lg:hidden">
             <Tabs defaultValue="tables" className="flex h-full flex-col">
               <TabsList className="grid w-full grid-cols-3 bg-secondary">
-                <TabsTrigger value="tables" className="text-xs sm:text-sm">
-                  Bàn
-                </TabsTrigger>
-                <TabsTrigger value="menu" className="text-xs sm:text-sm">
-                  Thực đơn
-                </TabsTrigger>
+                <TabsTrigger value="tables" className="text-xs sm:text-sm">`n                  {t.tabs.tables}`n                </TabsTrigger>
+                <TabsTrigger value="menu" className="text-xs sm:text-sm">`n                  {t.tabs.menu}`n                </TabsTrigger>
                 <TabsTrigger value="order" className="text-xs sm:text-sm">
-                  Đơn{" "}
+                  {t.tabs.order}{" "}
                   {orderItemCount > 0 && (
                     <span className="ml-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
                       {orderItemCount}

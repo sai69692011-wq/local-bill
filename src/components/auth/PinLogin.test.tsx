@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Tests for PinLoginScreen component.
  * Slices 3–6: gate states, form behaviour, busy/error, session boundary.
  */
@@ -28,7 +28,7 @@ describe("PinLoginScreen – Slice 3: boot states", () => {
     );
     expect(container.querySelector("header")).toBeNull();
     const alert = screen.getByRole("alert");
-    expect(alert.textContent).toMatch(/Không thể khởi tạo đăng nhập/i);
+    expect(alert.textContent).toMatch(/Could not initialize sign-in|Không thể khởi tạo đăng nhập/i);
   });
 
   it("renders login form (heading) without POS shell header", async () => {
@@ -61,7 +61,7 @@ describe("PinLoginScreen – Slice 4: form behaviour", () => {
 
   it("submit disabled until staff selected and 4-digit PIN entered", async () => {
     const { staff } = await setup();
-    const btn = screen.getByRole("button", { name: /đăng nhập/i });
+    const btn = screen.getByRole("button", { name: /sign in|đăng nhập/i });
     expect(btn).toBeDisabled();
     // Select first staff
     fireEvent.change(screen.getByRole("combobox"), { target: { value: staff[0].id } });
@@ -124,7 +124,7 @@ describe("PinLoginScreen – Slice 5: error and busy", () => {
     fireEvent.change(screen.getByRole("combobox"), { target: { value: staffId } });
     fireEvent.change(screen.getByLabelText(/PIN/i), { target: { value: pin } });
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /đăng nhập/i }));
+      fireEvent.click(screen.getByRole("button", { name: /sign in|đăng nhập/i }));
     });
   }
 
@@ -132,7 +132,7 @@ describe("PinLoginScreen – Slice 5: error and busy", () => {
     const { staff } = await setupWithSignIn(false);
     await submitWith(staff[0].id, "9999");
     await waitFor(() => {
-      expect(screen.getByRole("alert").textContent).toMatch(/PIN không đúng. Vui lòng thử lại./i);
+      expect(screen.getByRole("alert").textContent).toMatch(/Incorrect PIN. Please try again.|PIN không đúng. Vui lòng thử lại./i);
     });
   });
 
@@ -159,7 +159,7 @@ describe("PinLoginScreen – Slice 5: error and busy", () => {
     const { staff } = await setupWithSignIn(() => new Promise<boolean>((r) => { resolve = r; }));
     fireEvent.change(screen.getByRole("combobox"), { target: { value: staff[0].id } });
     fireEvent.change(screen.getByLabelText(/PIN/i), { target: { value: "7890" } });
-    const btn = screen.getByRole("button", { name: /đăng nhập/i });
+    const btn = screen.getByRole("button", { name: /sign in|đăng nhập/i });
     act(() => { fireEvent.click(btn); });
     await waitFor(() => expect(btn).toBeDisabled());
     await act(async () => { resolve(false); });
@@ -172,7 +172,7 @@ describe("PinLoginScreen – Slice 5: error and busy", () => {
     );
     fireEvent.change(screen.getByRole("combobox"), { target: { value: staff[0].id } });
     fireEvent.change(screen.getByLabelText(/PIN/i), { target: { value: "7890" } });
-    const form = screen.getByRole("button", { name: /đăng nhập/i }).closest("form")!;
+    const form = screen.getByRole("button", { name: /sign in|đăng nhập/i }).closest("form")!;
     fireEvent.submit(form);
     fireEvent.submit(form);
     expect(onSignIn).toHaveBeenCalledTimes(1);
@@ -186,7 +186,7 @@ describe("PinLoginScreen – Slice 5: error and busy", () => {
     );
     fireEvent.change(screen.getByRole("combobox"), { target: { value: staff[0].id } });
     fireEvent.change(screen.getByLabelText(/PIN/i), { target: { value: "7890" } });
-    const btn = screen.getByRole("button", { name: /đăng nhập/i });
+    const btn = screen.getByRole("button", { name: /sign in|đăng nhập/i });
     act(() => { fireEvent.click(btn); });
     await waitFor(() => expect(btn).toBeDisabled());
     fireEvent.click(btn); // second click should be no-op
@@ -246,7 +246,7 @@ describe("PinLoginScreen – Slice 2.5-B: focus after rejected sign-in", () => {
       fireEvent.change(pinInput, { target: { value: "9999" } });
 
       await act(async () => {
-        fireEvent.click(screen.getByRole("button", { name: /đăng nhập/i }));
+        fireEvent.click(screen.getByRole("button", { name: /sign in|đăng nhập/i }));
         // Settle promise chain without advancing fake timers.
         await new Promise<void>((resolve) => {
           // Use queueMicrotask to wait for all microtasks (onSignIn + React
@@ -287,7 +287,7 @@ describe("PinLoginScreen – Slice 6: success", () => {
     fireEvent.change(screen.getByRole("combobox"), { target: { value: staff[0].id } });
     fireEvent.change(screen.getByLabelText(/PIN/i), { target: { value: "7890" } });
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /đăng nhập/i }));
+      fireEvent.click(screen.getByRole("button", { name: /sign in|đăng nhập/i }));
     });
     await waitFor(() => {
       expect(onSignIn).toHaveBeenCalledWith(staff[0].id, "7890");
@@ -303,7 +303,7 @@ describe("PinLoginScreen – Slice 6: success", () => {
     const pinInput = screen.getByLabelText(/PIN/i) as HTMLInputElement;
     fireEvent.change(pinInput, { target: { value: "7890" } });
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /đăng nhập/i }));
+      fireEvent.click(screen.getByRole("button", { name: /sign in|đăng nhập/i }));
     });
     await waitFor(() => {
       expect(pinInput.value).toBe("");

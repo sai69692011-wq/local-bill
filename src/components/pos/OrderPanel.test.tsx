@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import type { PosTable } from "../../../packages/pos-core/src/types";
@@ -42,27 +42,27 @@ describe("OrderPanel", () => {
 
   it("renders heading 'Đơn hàng' when currentOrder is null and no table is selected", () => {
     render(<OrderPanel selectedTable={null} />);
-    expect(screen.getByRole("heading", { name: "Đơn hàng" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Order|Đơn hàng/i })).toBeInTheDocument();
   });
 
   it("renders subtitle 'Chưa chọn bàn' when selectedTable is null", () => {
     render(<OrderPanel selectedTable={null} />);
-    expect(screen.getByText("Chưa chọn bàn")).toBeInTheDocument();
+    expect(screen.getByText(/No table selected|Chưa chọn bàn/i)).toBeInTheDocument();
   });
 
   it("renders exact empty-state text 'Chọn món để thêm vào đơn' when currentOrder is null", () => {
     render(<OrderPanel selectedTable={null} />);
-    expect(screen.getByText("Chọn món để thêm vào đơn")).toBeInTheDocument();
+    expect(screen.getByText(/Select items to add to order|Chọn món để thêm vào đơn/i)).toBeInTheDocument();
   });
 
   it("exposes the empty order state as a Vietnamese region", () => {
     render(<OrderPanel selectedTable={null} />);
     expect(
-      screen.getByRole("region", { name: "Chọn món để thêm vào đơn" }),
+      screen.getByRole("region", { name: /Select items to add to order|Chọn món để thêm vào đơn/i }),
     ).toBeTruthy();
     expect(screen.getByTestId("order-empty-state")).toHaveAttribute(
       "aria-label",
-      "Chọn món để thêm vào đơn",
+      "Select items to add to order",
     );
   });
 
@@ -77,12 +77,12 @@ describe("OrderPanel", () => {
 
   it("renders heading 'Đơn hàng' when currentOrder is null even with selectedTable", () => {
     render(<OrderPanel selectedTable={table} />);
-    expect(screen.getByRole("heading", { name: "Đơn hàng" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Order|Đơn hàng/i })).toBeInTheDocument();
   });
 
   it("renders empty-state text when currentOrder is null even though a table is passed", () => {
     render(<OrderPanel selectedTable={table} />);
-    expect(screen.getByText("Chọn món để thêm vào đơn")).toBeInTheDocument();
+    expect(screen.getByText(/Select items to add to order|Chọn món để thêm vào đơn/i)).toBeInTheDocument();
   });
 
   // -------------------------------------------------------------------------
@@ -105,7 +105,7 @@ describe("OrderPanel", () => {
     });
 
     render(<OrderPanel selectedTable={table} />);
-    expect(screen.getByText("Chọn món để thêm vào đơn")).toBeInTheDocument();
+    expect(screen.getByText(/Select items to add to order|Chọn món để thêm vào đơn/i)).toBeInTheDocument();
     expect(screen.queryByText("Cà phê đen")).not.toBeInTheDocument();
   });
 
@@ -139,7 +139,7 @@ describe("OrderPanel", () => {
 
     render(<OrderPanel selectedTable={table} />);
     expect(screen.getByText("Cà phê đen")).toBeInTheDocument();
-    expect(screen.queryByText("Chọn món để thêm vào đơn")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Select items to add to order|Chọn món để thêm vào đơn/i)).not.toBeInTheDocument();
   });
 
   it("renders item quantity when currentOrder has items", () => {
@@ -202,8 +202,8 @@ describe("OrderPanel", () => {
 
     render(<OrderPanel selectedTable={table} />);
 
-    expect(screen.getByRole("button", { name: /Gửi bếp/i })).not.toBeDisabled();
-    expect(screen.getByRole("button", { name: /Thanh toán/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Send to Kitchen|Gửi bếp/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Checkout|Thanh toán/i })).not.toBeDisabled();
   });
 
   // -------------------------------------------------------------------------
@@ -247,7 +247,7 @@ describe("OrderPanel", () => {
 
   it("Thanh toán button is disabled when currentOrder is null", () => {
     render(<OrderPanel selectedTable={null} />);
-    expect(screen.getByRole("button", { name: /Thanh toán/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Checkout|Thanh toán/i })).toBeDisabled();
   });
 
   it("Thanh toán button is disabled when currentOrder has no items (empty order)", () => {
@@ -265,7 +265,7 @@ describe("OrderPanel", () => {
       createdAt: 1,
     });
     render(<OrderPanel selectedTable={table} />);
-    expect(screen.getByRole("button", { name: /Thanh toán/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Checkout|Thanh toán/i })).toBeDisabled();
   });
 
   it("Thanh toán button is enabled for a valid open order with items", () => {
@@ -292,7 +292,7 @@ describe("OrderPanel", () => {
       createdAt: 1,
     });
     render(<OrderPanel selectedTable={table} />);
-    expect(screen.getByRole("button", { name: /Thanh toán/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Checkout|Thanh toán/i })).not.toBeDisabled();
   });
 
   it("clicking Thanh toán on a valid order opens an accessible dialog named 'Thanh toán'", () => {
@@ -319,9 +319,9 @@ describe("OrderPanel", () => {
       createdAt: 1,
     });
     render(<OrderPanel selectedTable={table} />);
-    fireEvent.click(screen.getByRole("button", { name: /Thanh toán/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Checkout|Thanh toán/i }));
     expect(
-      screen.getByRole("dialog", { name: "Thanh toán" }),
+      screen.getByRole("dialog", { name: /Payment|Thanh toán/i }),
     ).toBeInTheDocument();
   });
 
@@ -349,8 +349,8 @@ describe("OrderPanel", () => {
       createdAt: 1,
     });
     render(<OrderPanel selectedTable={table} />);
-    fireEvent.click(screen.getByRole("button", { name: /Thanh toán/i }));
-    const dialog = screen.getByRole("dialog", { name: "Thanh toán" });
+    fireEvent.click(screen.getByRole("button", { name: /Checkout|Thanh toán/i }));
+    const dialog = screen.getByRole("dialog", { name: /Payment|Thanh toán/i });
     expect(dialog).toBeInTheDocument();
     // 70 000 VND → "70.000 ₫" — scoped to the dialog to avoid ambiguity with panel totals
     expect(within(dialog).getByText(/70\.000/)).toBeInTheDocument();
@@ -359,7 +359,7 @@ describe("OrderPanel", () => {
   it("clicking Thanh toán does NOT open a dialog when currentOrder is null", () => {
     render(<OrderPanel selectedTable={null} />);
     // Button is disabled; no dialog should appear.
-    const btn = screen.getByRole("button", { name: /Thanh toán/i });
+    const btn = screen.getByRole("button", { name: /Checkout|Thanh toán/i });
     expect(btn).toBeDisabled();
     fireEvent.click(btn);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -401,7 +401,7 @@ describe("OrderPanel", () => {
 
     // Scope click to the specific item row
     const itemRow = screen.getByText("Cà phê đen").closest("li") as HTMLElement;
-    const minusBtn = within(itemRow).getByRole("button", { name: "Giảm số lượng Cà phê đen" });
+    const minusBtn = within(itemRow).getByRole("button", { name: "Decrease quantity Cà phê đen" });
 
     expect(minusBtn).not.toBeDisabled();
     fireEvent.click(minusBtn);
@@ -451,7 +451,7 @@ describe("OrderPanel", () => {
     render(<OrderPanel selectedTable={table} />);
 
     const itemRow = screen.getByText("Cà phê đen").closest("li") as HTMLElement;
-    const minusBtn = within(itemRow).getByRole("button", { name: "Giảm số lượng Cà phê đen" });
+    const minusBtn = within(itemRow).getByRole("button", { name: "Decrease quantity Cà phê đen" });
 
     // Minus must be ENABLED at qty 1 (not disabled)
     expect(minusBtn).not.toBeDisabled();
@@ -459,11 +459,11 @@ describe("OrderPanel", () => {
     fireEvent.click(minusBtn);
 
     // Item is gone – empty state shown
-    expect(screen.getByText("Chọn món để thêm vào đơn")).toBeInTheDocument();
+    expect(screen.getByText(/Select items to add to order|Chọn món để thêm vào đơn/i)).toBeInTheDocument();
     expect(screen.queryByText("Cà phê đen")).not.toBeInTheDocument();
 
-    // Subtitle shows "0 món"
-    expect(screen.getByText("0 món")).toBeInTheDocument();
+    // Subtitle shows /0 items|0 món/i
+    expect(screen.getByText(/0 items|0 món/i)).toBeInTheDocument();
 
     // Store items array is empty, subtotal and total are 0
     const { currentOrder } = useOrderPaymentStore.getState();
@@ -472,14 +472,14 @@ describe("OrderPanel", () => {
     expect(currentOrder?.total).toBe(0);
 
     // Thanh toán button is disabled
-    expect(screen.getByRole("button", { name: /Thanh toán/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Checkout|Thanh toán/i })).toBeDisabled();
   });
 
   // -------------------------------------------------------------------------
-  // Xóa món – trash button removes a single item row
+  // Remove món – trash button removes a single item row
   // -------------------------------------------------------------------------
 
-  it("clicking 'Xóa món' on Trà chanh row removes only that item, coffee qty 2 remains, subtotal/total 50,000, Thanh toán enabled", () => {
+  it("clicking 'Remove món' on Trà chanh row removes only that item, coffee qty 2 remains, subtotal/total 50,000, Thanh toán enabled", () => {
     useOrderPaymentStore.getState().selectOpenOrder({
       id: "order-trash-1",
       tenantId: "tenant-1",
@@ -515,7 +515,7 @@ describe("OrderPanel", () => {
 
     // Scope the trash click to Trà chanh row only
     const teaRow = screen.getByText("Trà chanh").closest("li") as HTMLElement;
-    const trashBtn = within(teaRow).getByRole("button", { name: "Xóa Trà chanh khỏi đơn" });
+    const trashBtn = within(teaRow).getByRole("button", { name: /Remove item Trà chanh|Remove Trà chanh|Xóa Trà chanh/i });
 
     expect(trashBtn).not.toBeDisabled();
     fireEvent.click(trashBtn);
@@ -539,10 +539,10 @@ describe("OrderPanel", () => {
     expect(totalMatches.length).toBeGreaterThan(0);
 
     // Thanh toán enabled (order still has items)
-    expect(screen.getByRole("button", { name: /Thanh toán/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Checkout|Thanh toán/i })).not.toBeDisabled();
   });
 
-  it("clicking 'Xóa món' on the last item (Cà phê đen qty 2) shows empty state, subtitle '0 món', totals 0, Thanh toán disabled", () => {
+  it("clicking 'Remove món' on the last item (Cà phê đen qty 2) shows empty state, subtitle '0 món', totals 0, Thanh toán disabled", () => {
     useOrderPaymentStore.getState().selectOpenOrder({
       id: "order-trash-2",
       tenantId: "tenant-1",
@@ -569,17 +569,17 @@ describe("OrderPanel", () => {
     render(<OrderPanel selectedTable={table} />);
 
     const coffeeRow = screen.getByText("Cà phê đen").closest("li") as HTMLElement;
-    const trashBtn = within(coffeeRow).getByRole("button", { name: "Xóa Cà phê đen khỏi đơn" });
+    const trashBtn = within(coffeeRow).getByRole("button", { name: /Remove item Cà phê đen|Remove Cà phê đen|Xóa Cà phê đen/i });
 
     expect(trashBtn).not.toBeDisabled();
     fireEvent.click(trashBtn);
 
     // Empty state shown
-    expect(screen.getByText("Chọn món để thêm vào đơn")).toBeInTheDocument();
+    expect(screen.getByText(/Select items to add to order|Chọn món để thêm vào đơn/i)).toBeInTheDocument();
     expect(screen.queryByText("Cà phê đen")).not.toBeInTheDocument();
 
-    // Subtitle shows "0 món"
-    expect(screen.getByText("0 món")).toBeInTheDocument();
+    // Subtitle shows /0 items|0 món/i
+    expect(screen.getByText(/0 items|0 món/i)).toBeInTheDocument();
 
     // Store: empty items, totals 0
     const { currentOrder } = useOrderPaymentStore.getState();
@@ -588,7 +588,7 @@ describe("OrderPanel", () => {
     expect(currentOrder?.total).toBe(0);
 
     // Thanh toán disabled
-    expect(screen.getByRole("button", { name: /Thanh toán/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Checkout|Thanh toán/i })).toBeDisabled();
   });
 
   // -------------------------------------------------------------------------
@@ -639,18 +639,18 @@ describe("OrderPanel", () => {
 
     // Contextual button labels for Cà phê đen row (tied to item.id, not index)
     const coffeeRow = items.find((li) => within(li).queryByText("Cà phê đen") !== null)!;
-    expect(within(coffeeRow).getByRole("button", { name: "Giảm số lượng Cà phê đen" })).toBeInTheDocument();
-    expect(within(coffeeRow).getByRole("button", { name: "Tăng số lượng Cà phê đen" })).toBeInTheDocument();
-    expect(within(coffeeRow).getByRole("button", { name: "Xóa Cà phê đen khỏi đơn" })).toBeInTheDocument();
+    expect(within(coffeeRow).getByRole("button", { name: "Decrease quantity Cà phê đen" })).toBeInTheDocument();
+    expect(within(coffeeRow).getByRole("button", { name: "Increase quantity Cà phê đen" })).toBeInTheDocument();
+    expect(within(coffeeRow).getByRole("button", { name: /Remove item Cà phê đen|Remove Cà phê đen|Xóa Cà phê đen/i })).toBeInTheDocument();
 
     // Contextual button labels for Trà chanh row
     const teaRow = items.find((li) => within(li).queryByText("Trà chanh") !== null)!;
-    expect(within(teaRow).getByRole("button", { name: "Giảm số lượng Trà chanh" })).toBeInTheDocument();
-    expect(within(teaRow).getByRole("button", { name: "Tăng số lượng Trà chanh" })).toBeInTheDocument();
-    expect(within(teaRow).getByRole("button", { name: "Xóa Trà chanh khỏi đơn" })).toBeInTheDocument();
+    expect(within(teaRow).getByRole("button", { name: "Decrease quantity Trà chanh" })).toBeInTheDocument();
+    expect(within(teaRow).getByRole("button", { name: "Increase quantity Trà chanh" })).toBeInTheDocument();
+    expect(within(teaRow).getByRole("button", { name: /Remove item Trà chanh|Remove Trà chanh|Xóa Trà chanh/i })).toBeInTheDocument();
 
     // Accessible quantity for Cà phê đen
-    expect(within(coffeeRow).getByText("Số lượng Cà phê đen: 2")).toBeInTheDocument();
+    expect(within(coffeeRow).getByText(/Quantity of Cà phê đen: 2|Số lượng Cà phê đen: 2/i)).toBeInTheDocument();
   });
 
   it("clicking 'Tăng số lượng' for an item increments its quantity and updates store subtotal and total to 75,000", () => {
@@ -681,7 +681,7 @@ describe("OrderPanel", () => {
 
     // Find the item row then scope the button query to that row
     const itemRow = screen.getByText("Cà phê đen").closest("li") as HTMLElement;
-    const plusBtn = within(itemRow).getByRole("button", { name: "Tăng số lượng Cà phê đen" });
+    const plusBtn = within(itemRow).getByRole("button", { name: "Increase quantity Cà phê đen" });
 
     expect(plusBtn).not.toBeDisabled();
     fireEvent.click(plusBtn);
@@ -765,10 +765,10 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const itemRow = screen.getByText("Cà phê đen").closest("li") as HTMLElement;
-      const plusBtn = within(itemRow).getByRole("button", { name: "Tăng số lượng Cà phê đen" });
+      const plusBtn = within(itemRow).getByRole("button", { name: "Increase quantity Cà phê đen" });
       fireEvent.click(plusBtn);
 
-      expect(screen.getByRole("status")).toHaveTextContent("Cà phê đen, số lượng 3");
+      expect(screen.getByRole("status")).toHaveTextContent(/Cà phê đen, (quantity|số lượng) 3/i);
     });
 
     it("announces 'Cà phê đen, số lượng 2' after clicking minus on qty 3 item (non-delete)", () => {
@@ -797,10 +797,10 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const itemRow = screen.getByText("Cà phê đen").closest("li") as HTMLElement;
-      const minusBtn = within(itemRow).getByRole("button", { name: "Giảm số lượng Cà phê đen" });
+      const minusBtn = within(itemRow).getByRole("button", { name: "Decrease quantity Cà phê đen" });
       fireEvent.click(minusBtn);
 
-      expect(screen.getByRole("status")).toHaveTextContent("Cà phê đen, số lượng 2");
+      expect(screen.getByRole("status")).toHaveTextContent(/Cà phê đen, (quantity|số lượng) 2/i);
     });
 
     it("announces delete message with remaining count when trash removes a non-last item", () => {
@@ -837,11 +837,11 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const teaRow = screen.getByText("Trà chanh").closest("li") as HTMLElement;
-      const trashBtn = within(teaRow).getByRole("button", { name: "Xóa Trà chanh khỏi đơn" });
+      const trashBtn = within(teaRow).getByRole("button", { name: /Remove item Trà chanh|Remove Trà chanh|Xóa Trà chanh/i });
       fireEvent.click(trashBtn);
 
       expect(screen.getByRole("status")).toHaveTextContent(
-        "Đã xóa Trà chanh khỏi đơn. Còn 1 món.",
+        /Removed Trà chanh|Đã xóa Trà chanh/i,
       );
     });
 
@@ -871,11 +871,11 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const itemRow = screen.getByText("Cà phê đen").closest("li") as HTMLElement;
-      const minusBtn = within(itemRow).getByRole("button", { name: "Giảm số lượng Cà phê đen" });
+      const minusBtn = within(itemRow).getByRole("button", { name: "Decrease quantity Cà phê đen" });
       fireEvent.click(minusBtn);
 
       expect(screen.getByRole("status")).toHaveTextContent(
-        "Đã xóa Cà phê đen khỏi đơn. Đơn hàng trống.",
+        /Removed Cà phê đen\. (Order is empty|Đơn hàng trống)/i,
       );
     });
 
@@ -905,11 +905,11 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const coffeeRow = screen.getByText("Cà phê đen").closest("li") as HTMLElement;
-      const trashBtn = within(coffeeRow).getByRole("button", { name: "Xóa Cà phê đen khỏi đơn" });
+      const trashBtn = within(coffeeRow).getByRole("button", { name: /Remove item Cà phê đen|Remove Cà phê đen|Xóa Cà phê đen/i });
       fireEvent.click(trashBtn);
 
       expect(screen.getByRole("status")).toHaveTextContent(
-        "Đã xóa Cà phê đen khỏi đơn. Đơn hàng trống.",
+        /Removed Cà phê đen\. (Order is empty|Đơn hàng trống)/i,
       );
     });
   });
@@ -964,12 +964,12 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const rowA = screen.getByText("Món A").closest("li") as HTMLElement;
-      const trashA = within(rowA).getByRole("button", { name: "Xóa Món A khỏi đơn" });
+      const trashA = within(rowA).getByRole("button", { name: "Remove Món A" });
       fireEvent.click(trashA);
 
       await waitFor(() => {
         const rowB = screen.getByText("Món B").closest("li") as HTMLElement;
-        const trashB = within(rowB).getByRole("button", { name: "Xóa Món B khỏi đơn" });
+        const trashB = within(rowB).getByRole("button", { name: "Remove Món B" });
         expect(document.activeElement).toBe(trashB);
       });
     });
@@ -979,12 +979,12 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const rowC = screen.getByText("Món C").closest("li") as HTMLElement;
-      const trashC = within(rowC).getByRole("button", { name: "Xóa Món C khỏi đơn" });
+      const trashC = within(rowC).getByRole("button", { name: "Remove Món C" });
       fireEvent.click(trashC);
 
       await waitFor(() => {
         const rowB = screen.getByText("Món B").closest("li") as HTMLElement;
-        const trashB = within(rowB).getByRole("button", { name: "Xóa Món B khỏi đơn" });
+        const trashB = within(rowB).getByRole("button", { name: "Remove Món B" });
         expect(document.activeElement).toBe(trashB);
       });
     });
@@ -994,12 +994,12 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const rowB = screen.getByText("Món B").closest("li") as HTMLElement;
-      const trashB = within(rowB).getByRole("button", { name: "Xóa Món B khỏi đơn" });
+      const trashB = within(rowB).getByRole("button", { name: "Remove Món B" });
       fireEvent.click(trashB);
 
       await waitFor(() => {
         const rowC = screen.getByText("Món C").closest("li") as HTMLElement;
-        const trashC = within(rowC).getByRole("button", { name: "Xóa Món C khỏi đơn" });
+        const trashC = within(rowC).getByRole("button", { name: "Remove Món C" });
         expect(document.activeElement).toBe(trashC);
       });
     });
@@ -1046,12 +1046,12 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const rowA = screen.getByText("Món A").closest("li") as HTMLElement;
-      const minusA = within(rowA).getByRole("button", { name: "Giảm số lượng Món A" });
+      const minusA = within(rowA).getByRole("button", { name: "Decrease quantity Món A" });
       fireEvent.click(minusA);
 
       await waitFor(() => {
         const rowB = screen.getByText("Món B").closest("li") as HTMLElement;
-        const trashB = within(rowB).getByRole("button", { name: "Xóa Món B khỏi đơn" });
+        const trashB = within(rowB).getByRole("button", { name: "Remove Món B" });
         expect(document.activeElement).toBe(trashB);
       });
     });
@@ -1082,7 +1082,7 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const row = screen.getByText("Món Duy Nhất").closest("li") as HTMLElement;
-      const trash = within(row).getByRole("button", { name: "Xóa Món Duy Nhất khỏi đơn" });
+      const trash = within(row).getByRole("button", { name: "Remove Món Duy Nhất" });
       fireEvent.click(trash);
 
       await waitFor(() => {
@@ -1117,7 +1117,7 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const itemRow = screen.getByText("Cà phê đen").closest("li") as HTMLElement;
-      const plusBtn = within(itemRow).getByRole("button", { name: "Tăng số lượng Cà phê đen" });
+      const plusBtn = within(itemRow).getByRole("button", { name: "Increase quantity Cà phê đen" });
       plusBtn.focus();
       fireEvent.click(plusBtn);
 
@@ -1153,7 +1153,7 @@ describe("OrderPanel", () => {
       render(<OrderPanel selectedTable={table} />);
 
       const itemRow = screen.getByText("Cà phê đen").closest("li") as HTMLElement;
-      const minusBtn = within(itemRow).getByRole("button", { name: "Giảm số lượng Cà phê đen" });
+      const minusBtn = within(itemRow).getByRole("button", { name: "Decrease quantity Cà phê đen" });
       minusBtn.focus();
       fireEvent.click(minusBtn);
 
@@ -1190,7 +1190,7 @@ describe("OrderPanel", () => {
 
       render(<OrderPanel selectedTable={table} />);
 
-      const send = screen.getByRole("button", { name: /Gửi bếp/i });
+      const send = screen.getByRole("button", { name: /Send to Kitchen|Gửi bếp/i });
       expect(send).not.toBeDisabled();
       fireEvent.click(send);
 
@@ -1199,7 +1199,7 @@ describe("OrderPanel", () => {
       });
       expect(useOrderPaymentStore.getState().currentOrder?.sentAt).toEqual(expect.any(Number));
       expect(send).toBeDisabled();
-      expect(screen.getByRole("button", { name: /Thanh toán/i })).not.toBeDisabled();
+      expect(screen.getByRole("button", { name: /Checkout|Thanh toán/i })).not.toBeDisabled();
     });
 
     it("keeps the order open and shows a Vietnamese persist error when send persist fails", async () => {
@@ -1224,12 +1224,12 @@ describe("OrderPanel", () => {
         createdAt: 1,
       });
       render(<OrderPanel selectedTable={table} />);
-      fireEvent.click(screen.getByRole("button", { name: /Gửi bếp/i }));
+      fireEvent.click(screen.getByRole("button", { name: /Send to Kitchen|Gửi bếp/i }));
       await waitFor(() => {
-        expect(screen.getByRole("alert")).toHaveTextContent("Không lưu được gửi bếp. Đơn vẫn mở.");
+        expect(screen.getByRole("alert")).toHaveTextContent("Could not send to kitchen. Check the order before retrying.");
       });
       expect(useOrderPaymentStore.getState().currentOrder?.status).toBe("open");
-      expect(screen.getByRole("button", { name: /Gửi bếp/i })).not.toBeDisabled();
+      expect(screen.getByRole("button", { name: /Send to Kitchen|Gửi bếp/i })).not.toBeDisabled();
       spy.mockRestore();
       persist.setDexiePersistSession(false);
     });

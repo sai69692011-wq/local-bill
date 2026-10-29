@@ -7,6 +7,7 @@ import { useOrderPaymentStore } from "@/stores/order-payment-store";
 import { useTenantAuthStore } from "@/stores/tenant-auth-store";
 import { isDexiePersistSession, persistAfterOrderEdit, persistAfterSend } from "@/pos/dexie-persist";
 import { formatCurrency } from "@/lib/pos";
+import { t } from "@/lib/i18n";
 import type { PosTable } from "../../../packages/pos-core/src/types";
 import { PaymentModal } from "./PaymentModal";
 
@@ -104,12 +105,12 @@ export function OrderPanel({ selectedTable, onBeforePaymentConfirm, onPaymentSuc
     canPay && (currentOrder?.status === "open" || currentOrder?.status === "sent") && currentOrder.items.length > 0;
   const canSendKitchen = canSend && !sending && currentOrder?.status === "open" && currentOrder.items.length > 0;
 
-  // Heading is always "Đơn hàng". Only the subtitle adapts to selectedTable.
-  const headingText = "Đơn hàng";
+  // Heading is always "Order"
+  const headingText = t.order.heading;
 
   const subtitleText = selectedTable
-    ? `${currentOrder?.items.length ?? 0} món`
-    : "Chưa chọn bàn";
+    ? t.order.itemCount(currentOrder?.items.length ?? 0)
+    : t.order.noTableSelected;
 
   // Empty state: no order loaded at all, or order exists but items array is empty.
   const isEmpty = !currentOrder || currentOrder.items.length === 0;
@@ -138,45 +139,44 @@ export function OrderPanel({ selectedTable, onBeforePaymentConfirm, onPaymentSuc
             data-testid="order-empty-state"
             tabIndex={-1}
             role="region"
-            aria-label="Chọn món để thêm vào đơn"
+            aria-label={t.order.emptyPlaceholder}
             className="flex flex-col items-center justify-center py-10 text-muted-foreground"
           >
             <Receipt className="mb-2 h-10 w-10 opacity-40" aria-hidden="true" />
-            <p className="text-sm">Chọn món để thêm vào đơn</p>
+            <p className="text-sm">{t.order.emptyPlaceholder}</p>
           </div>
         ) : (
-          <ul className="flex flex-col gap-3 list-none m-0 p-0">
+          <ul className="flex flex-col gap-3 list-none m-0 p-0" role="list">
             {currentOrder!.items.map((item, index) => (
               <li
                 key={item.id}
+                role="listitem"
                 className="flex items-center justify-between rounded-xl border border-border bg-card p-3"
               >
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-card-foreground text-sm">
                     {item.name}
                   </p>
-                  {item.note && (
-                    <p className="text-xs text-muted-foreground">{item.note}</p>
-                  )}
                   <p className="text-xs text-muted-foreground">
                     {formatCurrency(item.price)}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <button
-                    aria-label={`Giảm số lượng ${item.name}`}
+                    type="button"
+                    aria-label={`${t.order.decreaseQty} ${item.name}`}
                     onClick={() => {
-                      if (item.quantity === 1) {
+                      if (item.quantity <= 1) {
                         // Snapshot items and index before removal
                         const snapshot = currentOrder!.items;
                         const deletedIndex = index;
+                        const remaining = snapshot.length - 1;
                         const ok = removeItem(item.id);
                         if (ok) {
-                          const remaining = snapshot.length - 1;
                           setAnnouncement(
                             remaining === 0
-                              ? `Đã xóa ${item.name} khỏi đơn. Đơn hàng trống.`
-                              : `Đã xóa ${item.name} khỏi đơn. Còn ${remaining} món.`,
+                              ? t.order.announcedRemovedAll(item.name)
+                              : t.order.announcedRemoved(item.name, remaining),
                           );
                           setPendingFocusTarget(computeFocusTarget(snapshot, deletedIndex));
                           persistEdit();
@@ -184,7 +184,7 @@ export function OrderPanel({ selectedTable, onBeforePaymentConfirm, onPaymentSuc
                       } else {
                         const ok = updateItemQuantity(item.id, item.quantity - 1);
                         if (ok) {
-                          setAnnouncement(`${item.name}, số lượng ${item.quantity - 1}`);
+                          setAnnouncement(`${item.name}, quantity ${item.quantity - 1}`);
                           persistEdit();
                         }
                       }
@@ -193,16 +193,20 @@ export function OrderPanel({ selectedTable, onBeforePaymentConfirm, onPaymentSuc
                   >
                     <Minus className="h-3 w-3" aria-hidden="true" />
                   </button>
-                  <span className="w-5 text-center text-sm font-semibold" aria-hidden="true">
+                  <span
+                    aria-hidden="true"
+                    className="w-7 text-center font-semibold text-foreground text-xs"
+                  >
                     {item.quantity}
                   </span>
-                  <span className="sr-only">{`Số lượng ${item.name}: ${item.quantity}`}</span>
+                  <span className="sr-only">{`Quantity of ${item.name}: ${item.quantity}`}</span>
                   <button
-                    aria-label={`Tăng số lượng ${item.name}`}
+                    type="button"
+                    aria-label={`${t.order.increaseQty} ${item.name}`}
                     onClick={() => {
                       const ok = updateItemQuantity(item.id, item.quantity + 1);
                       if (ok) {
-                        setAnnouncement(`${item.name}, số lượng ${item.quantity + 1}`);
+                        setAnnouncement(`${item.name}, quantity ${item.quantity + 1}`);
                         persistEdit();
                       }
                     }}
@@ -211,11 +215,12 @@ export function OrderPanel({ selectedTable, onBeforePaymentConfirm, onPaymentSuc
                     <Plus className="h-3 w-3" aria-hidden="true" />
                   </button>
                   <button
+                    type="button"
                     ref={(el) => {
-                      trashRefs.current.set(item.id, el);
-                      return () => { trashRefs.current.delete(item.id); };
+                      if (el) trashRefs.current.set(item.id, el);
+                      else trashRefs.current.delete(item.id);
                     }}
-                    aria-label={`Xóa ${item.name} khỏi đơn`}
+                    aria-label={`${t.order.removeItem} ${item.name}`}
                     onClick={() => {
                       // Snapshot items and index before removal
                       const snapshot = currentOrder!.items;
@@ -225,16 +230,16 @@ export function OrderPanel({ selectedTable, onBeforePaymentConfirm, onPaymentSuc
                       if (ok) {
                         setAnnouncement(
                           remaining === 0
-                            ? `Đã xóa ${item.name} khỏi đơn. Đơn hàng trống.`
-                            : `Đã xóa ${item.name} khỏi đơn. Còn ${remaining} món.`,
+                            ? t.order.announcedRemovedAll(item.name)
+                            : t.order.announcedRemoved(item.name, remaining),
                         );
                         setPendingFocusTarget(computeFocusTarget(snapshot, deletedIndex));
                         persistEdit();
                       }
                     }}
-                    className="ml-1 flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-destructive transition-colors"
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                   >
-                    <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </div>
               </li>
@@ -248,11 +253,11 @@ export function OrderPanel({ selectedTable, onBeforePaymentConfirm, onPaymentSuc
       {/* Totals – read directly from store; no local recomputation */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Tạm tính</span>
+          <span className="text-muted-foreground">Subtotal</span>
           <span>{formatCurrency(currentOrder?.subtotal ?? 0)}</span>
         </div>
         <div className="flex items-center justify-between text-base font-semibold">
-          <span>Tổng cộng</span>
+          <span>{t.payment.totalLabel}</span>
           <span className="text-xl font-bold text-primary">
             {formatCurrency(currentOrder?.total ?? 0)}
           </span>
@@ -276,11 +281,11 @@ export function OrderPanel({ selectedTable, onBeforePaymentConfirm, onPaymentSuc
             const finish = (persisted: boolean) => {
               setSending(false);
               if (persisted) {
-                setAnnouncement("Đã gửi bếp");
+                setAnnouncement("Sent to kitchen");
                 return;
               }
               revertSendToKitchen(sentAt);
-              setPersistError("Không lưu được gửi bếp. Đơn vẫn mở.");
+              setPersistError(t.order.persistError);
             };
             if (!isDexiePersistSession()) {
               finish(true);
@@ -300,7 +305,7 @@ export function OrderPanel({ selectedTable, onBeforePaymentConfirm, onPaymentSuc
           } : undefined}
         >
           <ChefHat className="mr-2 h-4 w-4" aria-hidden="true" />
-          Gửi bếp
+          {sending ? t.order.sendingToKitchen : t.order.sendToKitchen}
         </Button>
         <Button
           className="h-12 bg-primary text-sm font-semibold text-primary-foreground shadow-sm"
@@ -308,7 +313,7 @@ export function OrderPanel({ selectedTable, onBeforePaymentConfirm, onPaymentSuc
           onClick={canOpenPayment ? () => setIsPaymentOpen(true) : undefined}
         >
           <Receipt className="mr-2 h-4 w-4" aria-hidden="true" />
-          Thanh toán
+          {t.order.checkout}
         </Button>
       </div>
 

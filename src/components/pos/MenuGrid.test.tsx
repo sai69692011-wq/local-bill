@@ -163,37 +163,37 @@ describe("MenuGrid", () => {
     expect(screen.queryByText("Cà phê đen")).not.toBeInTheDocument();
   });
 
-  it("exposes the searchbox as a Vietnamese named search field", () => {
+  it("exposes the searchbox as a named search field", () => {
     render(<MenuGrid groups={groups} items={items} />);
-    expect(screen.getByRole("searchbox", { name: "Tìm món" })).toBeTruthy();
+    expect(screen.getByRole("searchbox", { name: /Search menu|Tìm món/i })).toBeTruthy();
   });
 
   // --- empty catalog text ---
 
-  it("shows exact text 'Chưa có món để hiển thị' when groups/items are empty", () => {
+  it("shows exact text 'No items to display' when groups/items are empty", () => {
     render(<MenuGrid groups={[]} items={[]} />);
-    expect(screen.getByText("Chưa có món để hiển thị")).toBeInTheDocument();
+    expect(screen.getByText("No items to display")).toBeInTheDocument();
   });
 
-  it("exposes the empty catalog state as a Vietnamese status", () => {
+  it("exposes the empty catalog state as an accessible status", () => {
     render(<MenuGrid groups={[]} items={[]} />);
     expect(
-      screen.getByRole("status", { name: "Chưa có món để hiển thị" }),
+      screen.getByRole("status", { name: "No items to display" }),
     ).toBeTruthy();
   });
 
   // --- group with no matching query ---
 
-  it("shows exact text 'Không tìm thấy món nào' when search matches nothing in active group", () => {
+  it("shows exact text 'No items found' when search matches nothing in active group", () => {
     render(<MenuGrid groups={groups} items={items} />);
 
     const searchInput = screen.getByRole("searchbox");
     fireEvent.change(searchInput, { target: { value: "xyzxyzxyz" } });
 
-    expect(screen.getByText("Không tìm thấy món nào")).toBeInTheDocument();
+    expect(screen.getByText("No items found")).toBeInTheDocument();
   });
 
-  it("exposes the search no-result state as a Vietnamese status", () => {
+  it("exposes the search no-result state as an accessible status", () => {
     render(<MenuGrid groups={groups} items={items} />);
 
     fireEvent.change(screen.getByRole("searchbox"), {
@@ -201,7 +201,7 @@ describe("MenuGrid", () => {
     });
 
     expect(
-      screen.getByRole("status", { name: "Không tìm thấy món nào" }),
+      screen.getByRole("status", { name: "No items found" }),
     ).toBeTruthy();
   });
 

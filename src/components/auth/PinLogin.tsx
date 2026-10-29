@@ -8,6 +8,7 @@ import type { Staff } from "../../../packages/pos-core/src/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { t } from "@/lib/i18n";
 
 // --- Types ---
 
@@ -30,14 +31,14 @@ function LoadingScreen() {
     <main className="flex min-h-screen items-center justify-center bg-background px-4">
       <div
         role="status"
-        aria-label="Đang khởi tạo"
+        aria-label={t.auth.loadingAria}
         className="flex flex-col items-center gap-3 text-muted-foreground"
       >
         <div
           aria-hidden="true"
           className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"
         />
-        <span className="text-sm">Đang khởi tạo…</span>
+        <span className="text-sm">{t.auth.loadingText}</span>
       </div>
     </main>
   );
@@ -52,8 +53,8 @@ function FatalScreen() {
         role="alert"
         className="max-w-sm rounded-xl border border-destructive bg-destructive/10 p-6 text-center text-destructive"
       >
-        <p className="font-semibold">Không thể khởi tạo đăng nhập.</p>
-        <p className="mt-1 text-sm text-muted-foreground">Vui lòng tải lại trang.</p>
+        <p className="font-semibold">{t.auth.fatalTitle}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t.auth.fatalSubtitle}</p>
       </div>
     </main>
   );
@@ -113,19 +114,17 @@ function LoginForm({
     try {
       const ok = await onSignIn(currentStaffId, currentPin);
       if (!ok) {
-        setError("PIN không đúng. Vui lòng thử lại.");
+        setError(t.auth.errorMessage);
         setFocusPin(true);
       }
     } catch {
-      setError("PIN không đúng. Vui lòng thử lại.");
+      setError(t.auth.errorMessage);
       setFocusPin(true);
     } finally {
       submittingRef.current = false;
       setBusy(false);
     }
   }
-
-  const selectedStaff = staff.find((s) => s.id === selectedId);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -136,7 +135,7 @@ function LoginForm({
           <h1
             className="mb-1 text-center text-xl font-bold text-card-foreground sm:text-2xl"
           >
-            Đăng nhập
+            {t.auth.heading}
           </h1>
           <p className="mb-6 text-center text-sm text-muted-foreground">
             {tenantName}
@@ -153,7 +152,7 @@ function LoginForm({
                 htmlFor={selectId}
                 className="mb-1.5 block text-sm font-medium text-foreground"
               >
-                Nhân viên
+                {t.auth.staffLabel}
               </label>
               <select
                 id={selectId}
@@ -163,14 +162,14 @@ function LoginForm({
                   setError("");
                 }}
                 disabled={busy}
-                aria-label="Chọn nhân viên"
+                aria-label={t.auth.selectStaffAria}
                 className={cn(
                   "flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-base shadow-sm",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                   "disabled:cursor-not-allowed disabled:opacity-50",
                 )}
               >
-                <option value="">-- Chọn nhân viên --</option>
+                <option value="">{t.auth.selectStaffPlaceholder}</option>
                 {staff.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.name}
@@ -185,7 +184,7 @@ function LoginForm({
                 htmlFor={pinId}
                 className="mb-1.5 block text-sm font-medium text-foreground"
               >
-                PIN
+                {t.auth.pinLabel}
               </label>
               <Input
                 ref={pinRef}
@@ -223,7 +222,7 @@ function LoginForm({
               aria-busy={busy}
               className="h-11 w-full text-base font-semibold"
             >
-              {busy ? "Đang đăng nhập…" : "Đăng nhập"}
+              {busy ? t.auth.submittingButton : t.auth.submitButton}
             </Button>
           </form>
         </div>

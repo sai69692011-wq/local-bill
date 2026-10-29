@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { PaymentModal } from "./PaymentModal";
@@ -34,7 +34,7 @@ describe("PaymentModal", () => {
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
     expect(
-      screen.getByRole("dialog", { name: "Thanh toán" }),
+      screen.getByRole("dialog", { name: /Payment|Thanh toán/i }),
     ).toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe("PaymentModal", () => {
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
     expect(
-      screen.queryByRole("button", { name: /xác nhận thanh toán/i }),
+      screen.queryByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i }),
     ).not.toBeInTheDocument();
   });
 
@@ -120,35 +120,35 @@ describe("PaymentModal", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
-    expect(screen.getByRole("button", { name: /tiền mặt/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Cash|tiền mặt/i })).toBeInTheDocument();
   });
 
   it("renders a method control labelled 'Chuyển khoản'", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
-    expect(screen.getByRole("button", { name: /chuyển khoản/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Bank Transfer|chuyển khoản/i })).toBeInTheDocument();
   });
 
   it("renders a method control labelled 'Thẻ'", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
-    expect(screen.getByRole("button", { name: /thẻ/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Card|thẻ/i })).toBeInTheDocument();
   });
 
   it("renders a method control labelled 'Khác'", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
-    expect(screen.getByRole("button", { name: /khác/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Other|khác/i })).toBeInTheDocument();
   });
 
   it("default selected method is 'Tiền mặt' (aria-pressed='true')", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
-    expect(screen.getByRole("button", { name: /tiền mặt/i })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: /Cash|tiền mặt/i })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
@@ -158,15 +158,15 @@ describe("PaymentModal", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
-    expect(screen.getByRole("button", { name: /chuyển khoản/i })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: /Bank Transfer|chuyển khoản/i })).toHaveAttribute(
       "aria-pressed",
       "false",
     );
-    expect(screen.getByRole("button", { name: /thẻ/i })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: /Card|thẻ/i })).toHaveAttribute(
       "aria-pressed",
       "false",
     );
-    expect(screen.getByRole("button", { name: /khác/i })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: /Other|khác/i })).toHaveAttribute(
       "aria-pressed",
       "false",
     );
@@ -176,8 +176,8 @@ describe("PaymentModal", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
-    fireEvent.click(screen.getByRole("button", { name: /chuyển khoản/i }));
-    expect(screen.getByRole("button", { name: /chuyển khoản/i })).toHaveAttribute(
+    fireEvent.click(screen.getByRole("button", { name: /Bank Transfer|chuyển khoản/i }));
+    expect(screen.getByRole("button", { name: /Bank Transfer|chuyển khoản/i })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
@@ -187,8 +187,8 @@ describe("PaymentModal", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
-    fireEvent.click(screen.getByRole("button", { name: /chuyển khoản/i }));
-    expect(screen.getByRole("button", { name: /tiền mặt/i })).toHaveAttribute(
+    fireEvent.click(screen.getByRole("button", { name: /Bank Transfer|chuyển khoản/i }));
+    expect(screen.getByRole("button", { name: /Cash|tiền mặt/i })).toHaveAttribute(
       "aria-pressed",
       "false",
     );
@@ -198,7 +198,7 @@ describe("PaymentModal", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
-    fireEvent.click(screen.getByRole("button", { name: /chuyển khoản/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Bank Transfer|chuyển khoản/i }));
     const selected = screen
       .getAllByRole("button")
       .filter((btn) => btn.getAttribute("aria-pressed") === "true");
@@ -210,7 +210,7 @@ describe("PaymentModal", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={onOpenChange} />,
     );
-    fireEvent.click(screen.getByRole("button", { name: /chuyển khoản/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Bank Transfer|chuyển khoản/i }));
     expect(onOpenChange).not.toHaveBeenCalled();
   });
 
@@ -222,7 +222,7 @@ describe("PaymentModal", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
-    expect(screen.getByRole("button", { name: /hủy/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Cancel|hủy/i })).toBeInTheDocument();
   });
 
   it("clicking 'Hủy' calls onOpenChange(false)", () => {
@@ -230,7 +230,7 @@ describe("PaymentModal", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={onOpenChange} />,
     );
-    fireEvent.click(screen.getByRole("button", { name: /hủy/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Cancel|hủy/i }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
@@ -245,7 +245,7 @@ describe("PaymentModal", () => {
         staffId="staff-1"
       />,
     );
-    for (const name of ["Tiền mặt", "Chuyển khoản", "Thẻ", "Khác", "Hủy", "Xác nhận thanh toán"]) {
+    for (const name of [/Cash|Tiền mặt/i, /Bank Transfer|Chuyển khoản/i, /Card|Thẻ/i, /Other|Khác/i, /Cancel|Hủy/i, /Confirm Payment|Xác nhận thanh toán/i]) {
       expect(screen.getByRole("button", { name })).toHaveAttribute("type", "button");
     }
   });
@@ -275,11 +275,11 @@ describe("PaymentModal", () => {
       />,
     );
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "50000" } });
-    fireEvent.click(screen.getByRole("button", { name: /xác nhận thanh toán/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i }));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "In hóa đơn" })).toHaveAttribute("type", "button");
+      expect(screen.getByRole("button", { name: /Print Receipt|In hóa đơn/i })).toHaveAttribute("type", "button");
     });
-    expect(screen.getByRole("button", { name: "Đóng" })).toHaveAttribute("type", "button");
+    expect(screen.getByRole("button", { name: /Close|Đóng/i })).toHaveAttribute("type", "button");
   });
 
   it("clicking the backdrop calls onOpenChange(false)", () => {
@@ -300,7 +300,7 @@ describe("PaymentModal", () => {
     render(
       <PaymentModal open={true} orderTotal={50_000} onOpenChange={vi.fn()} />,
     );
-    fireEvent.click(screen.getByRole("button", { name: /chuyển khoản/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Bank Transfer|chuyển khoản/i }));
     expect(
       screen.queryByRole("button", { name: /xác nhận/i }),
     ).not.toBeInTheDocument();
@@ -356,43 +356,43 @@ describe("PaymentModal – payment lifecycle (Task 2.10)", () => {
 
   it("tender input is labelled 'Số tiền khách đưa' or similar", () => {
     render(<PaymentModal {...baseProps()} />);
-    expect(screen.getByLabelText(/số tiền khách đưa|tiền khách|tender/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Amount Received|số tiền khách đưa|tiền khách|tender/i)).toBeInTheDocument();
   });
 
   it("renders 'Xác nhận thanh toán' confirm button when orderId is provided", () => {
     render(<PaymentModal {...baseProps()} />);
-    expect(screen.getByRole("button", { name: /xác nhận thanh toán/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i })).toBeInTheDocument();
   });
 
   it("confirm button is disabled when tender input is empty", () => {
     render(<PaymentModal {...baseProps()} />);
-    expect(screen.getByRole("button", { name: /xác nhận thanh toán/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i })).toBeDisabled();
   });
 
   it("confirm button is disabled when tender < orderTotal", () => {
     render(<PaymentModal {...baseProps()} />);
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "40000" } });
-    expect(screen.getByRole("button", { name: /xác nhận thanh toán/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i })).toBeDisabled();
   });
 
   it("confirm button is enabled when cash tender >= orderTotal", () => {
     render(<PaymentModal {...baseProps()} />);
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "60000" } });
-    expect(screen.getByRole("button", { name: /xác nhận thanh toán/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i })).not.toBeDisabled();
   });
 
   it("confirm button is disabled for transfer method when tender > orderTotal", () => {
     render(<PaymentModal {...baseProps()} />);
-    fireEvent.click(screen.getByRole("button", { name: /chuyển khoản/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Bank Transfer|chuyển khoản/i }));
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "60000" } });
-    expect(screen.getByRole("button", { name: /xác nhận thanh toán/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i })).toBeDisabled();
   });
 
   it("confirm button is enabled for card method when tender === orderTotal", () => {
     render(<PaymentModal {...baseProps()} />);
-    fireEvent.click(screen.getByRole("button", { name: /thẻ/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Card|thẻ/i }));
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "50000" } });
-    expect(screen.getByRole("button", { name: /xác nhận thanh toán/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i })).not.toBeDisabled();
   });
 
   it("shows change amount display for cash over-tender before confirmation", () => {
@@ -404,7 +404,7 @@ describe("PaymentModal – payment lifecycle (Task 2.10)", () => {
 
   it("does not show nonzero change display for transfer when tender equals total", () => {
     render(<PaymentModal {...baseProps()} />);
-    fireEvent.click(screen.getByRole("button", { name: /chuyển khoản/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Bank Transfer|chuyển khoản/i }));
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "50000" } });
     // At minimum, modal does not crash
     const dialog = screen.getByRole("dialog");
@@ -416,12 +416,12 @@ describe("PaymentModal – payment lifecycle (Task 2.10)", () => {
     loadOrder();
     render(<PaymentModal {...baseProps()} onOpenChange={onOpenChange} onPaymentSuccess={() => true} />);
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "60000" } });
-    fireEvent.click(screen.getByRole("button", { name: /xác nhận thanh toán/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i }));
     await waitFor(() => {
-      expect(screen.getByRole("region", { name: "Hóa đơn thanh toán" })).toBeInTheDocument();
+      expect(screen.getByRole("region", { name: /Payment Receipt|Hóa đơn thanh toán/i })).toBeInTheDocument();
     });
-    expect(screen.getByText(/mã thanh toán/i)).toBeInTheDocument();
-    expect(screen.getByText(/tiền mặt/i)).toBeInTheDocument();
+    expect(screen.getByText(/Payment ID|mã thanh toán/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cash|tiền mặt/i)).toBeInTheDocument();
     expect(screen.getByText(/10\.000/)).toBeInTheDocument();
     expect(onOpenChange).not.toHaveBeenCalled();
   });
@@ -429,13 +429,13 @@ describe("PaymentModal – payment lifecycle (Task 2.10)", () => {
   it("shows zero change on transfer receipt", async () => {
     loadOrder();
     render(<PaymentModal {...baseProps()} onPaymentSuccess={() => true} />);
-    fireEvent.click(screen.getByRole("button", { name: "Chuyển khoản" }));
+    fireEvent.click(screen.getByRole("button", { name: /Bank Transfer|Chuyển khoản/i }));
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "50000" } });
-    fireEvent.click(screen.getByRole("button", { name: /xác nhận thanh toán/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i }));
     await waitFor(() => {
-      expect(screen.getByRole("region", { name: "Hóa đơn thanh toán" })).toHaveTextContent("Chuyển khoản");
+      expect(screen.getByRole("region", { name: /Payment Receipt|Hóa đơn thanh toán/i })).toHaveTextContent(/Bank Transfer|Chuyển khoản/);
     });
-    expect(screen.getByRole("region", { name: "Hóa đơn thanh toán" })).toHaveTextContent(/Tiền thối:\s*0/);
+    expect(screen.getByRole("region", { name: /Payment Receipt|Hóa đơn thanh toán/i })).toHaveTextContent(/Change:\s*0|Tiền thối:\s*0/);
   });
 
   it("prints receipt and closes it once", async () => {
@@ -445,14 +445,14 @@ describe("PaymentModal – payment lifecycle (Task 2.10)", () => {
     loadOrder();
     render(<PaymentModal {...baseProps()} onOpenChange={onOpenChange} onPaymentSuccess={() => true} onReceiptClose={onReceiptClose} />);
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "50000" } });
-    fireEvent.click(screen.getByRole("button", { name: /xác nhận thanh toán/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i }));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "In hóa đơn" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Print Receipt|In hóa đơn/i })).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByRole("button", { name: "In hóa đơn" }));
+    fireEvent.click(screen.getByRole("button", { name: /Print Receipt|In hóa đơn/i }));
     expect(print).toHaveBeenCalledOnce();
-    fireEvent.click(screen.getByRole("button", { name: "Đóng" }));
-    fireEvent.click(screen.getByRole("button", { name: "Đóng" }));
+    fireEvent.click(screen.getByRole("button", { name: /Close|Đóng/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Close|Đóng/i }));
     expect(onReceiptClose).toHaveBeenCalledOnce();
     expect(onOpenChange).toHaveBeenCalledOnce();
     expect(onOpenChange).toHaveBeenCalledWith(false);
@@ -473,9 +473,9 @@ describe("PaymentModal – payment lifecycle (Task 2.10)", () => {
       />,
     );
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "60000" } });
-    fireEvent.click(screen.getByRole("button", { name: /xác nhận thanh toán/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i }));
     await waitFor(() => {
-      expect(screen.getByText(/thanh toán thành công|thành công/i)).toBeInTheDocument();
+      expect(screen.getByText(/Payment Successful|thanh toán thành công|thành công/i)).toBeInTheDocument();
     });
   });
 
@@ -485,7 +485,7 @@ describe("PaymentModal – payment lifecycle (Task 2.10)", () => {
     loadOrder();
     render(<PaymentModal {...baseProps()} onOpenChange={onOpenChange} onBeforeConfirm={() => false} onPaymentSuccess={onPaymentSuccess} />);
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "50000" } });
-    fireEvent.click(screen.getByRole("button", { name: /xác nhận thanh toán/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i }));
     expect(useOrderPaymentStore.getState().currentOrder?.status).toBe("open");
     expect(useOrderPaymentStore.getState().payments).toHaveLength(0);
     expect(onPaymentSuccess).not.toHaveBeenCalled();
@@ -499,17 +499,17 @@ describe("PaymentModal – payment lifecycle (Task 2.10)", () => {
     loadOrder();
     render(<PaymentModal {...baseProps()} onOpenChange={onOpenChange} onPaymentSuccess={() => pending} />);
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "50000" } });
-    fireEvent.click(screen.getByRole("button", { name: /xác nhận thanh toán/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i }));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Hủy/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /Cancel|Hủy/i })).toBeDisabled();
     });
-    expect(screen.getByRole("button", { name: /xác nhận thanh toán/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i })).toBeDisabled();
     resolvePay(false);
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent("Không lưu được thanh toán. Kiểm tra lại đơn trước khi thu tiếp.");
+      expect(screen.getByRole("alert")).toHaveTextContent("Could not record payment. Check the order before retrying.");
     });
-    expect(screen.getByRole("button", { name: /Hủy/i })).not.toBeDisabled();
-    expect(screen.queryByText(/thanh toán thành công/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Cancel|Hủy/i })).not.toBeDisabled();
+    expect(screen.queryByText(/Payment Successful|thanh toán thành công/i)).not.toBeInTheDocument();
     expect(onOpenChange).not.toHaveBeenCalled();
   });
 
@@ -518,11 +518,11 @@ describe("PaymentModal – payment lifecycle (Task 2.10)", () => {
     loadOrder();
     render(<PaymentModal {...baseProps()} onOpenChange={onOpenChange} onPaymentSuccess={async () => { throw new Error("idb"); }} />);
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "50000" } });
-    fireEvent.click(screen.getByRole("button", { name: /xác nhận thanh toán/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i }));
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent("Không lưu được thanh toán. Kiểm tra lại đơn trước khi thu tiếp.");
+      expect(screen.getByRole("alert")).toHaveTextContent("Could not record payment. Check the order before retrying.");
     });
-    expect(screen.queryByText(/thanh toán thành công/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Payment Successful|thanh toán thành công/i)).not.toBeInTheDocument();
     expect(onOpenChange).not.toHaveBeenCalled();
   });
 
@@ -542,7 +542,7 @@ describe("PaymentModal – payment lifecycle (Task 2.10)", () => {
       />,
     );
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "50000" } });
-    fireEvent.click(screen.getByRole("button", { name: /xác nhận thanh toán/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Confirm Payment|xác nhận thanh toán/i }));
     expect(onPaymentSuccess).not.toHaveBeenCalled();
     expect(onOpenChange).not.toHaveBeenCalled();
   });

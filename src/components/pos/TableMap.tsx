@@ -1,6 +1,6 @@
 import React from "react";
-import { User } from "lucide-react";
 import type { PosTable, TableStatus } from "../../../packages/pos-core/src/types";
+import { t } from "@/lib/i18n";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -19,11 +19,11 @@ export interface TableMapProps {
 function getStatusLabel(status: TableStatus): string {
   switch (status) {
     case "empty":
-      return "Trống";
+      return t.tables.statusEmpty;
     case "occupied":
-      return "Có khách";
+      return t.tables.statusOccupied;
     case "waiting_payment":
-      return "Chờ thanh toán";
+      return t.tables.statusWaitingPayment;
   }
 }
 
@@ -60,7 +60,7 @@ function TableCard({ table, selected, onClick }: TableCardProps) {
       } ${statusColor}`}
     >
       <span className="text-sm font-semibold sm:text-base">
-        {`Bàn ${table.number}`}
+        {t.tables.tableName(table.number)}
       </span>
       <span className="mt-1 text-xs font-medium opacity-90">
         {getStatusLabel(table.status)}
@@ -88,9 +88,9 @@ export function TableMap({ tables, selectedTableId, onSelect }: TableMapProps) {
         <p
           className="text-sm"
           role="status"
-          aria-label="Chưa có bàn để hiển thị"
+          aria-label={t.tables.emptyStatusAria}
         >
-          Chưa có bàn để hiển thị
+          {t.tables.emptyStatusAria}
         </p>
       </div>
     );

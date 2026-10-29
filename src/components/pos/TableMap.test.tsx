@@ -38,7 +38,7 @@ const tables: PosTable[] = [
 // ---------------------------------------------------------------------------
 
 describe("TableMap", () => {
-  it("renders three table cards sorted by number ascending (Bàn 1, Bàn 2, Bàn 3)", () => {
+  it("renders three table cards sorted by number ascending (Table 1, Table 2, Table 3)", () => {
     render(
       <TableMap
         tables={tables}
@@ -52,12 +52,12 @@ describe("TableMap", () => {
     expect(buttons).toHaveLength(3);
 
     // Verify labels in sorted order: number 1, 2, 3
-    expect(buttons[0]).toHaveTextContent("Bàn 1");
-    expect(buttons[1]).toHaveTextContent("Bàn 2");
-    expect(buttons[2]).toHaveTextContent("Bàn 3");
+    expect(buttons[0]).toHaveTextContent("Table 1");
+    expect(buttons[1]).toHaveTextContent("Table 2");
+    expect(buttons[2]).toHaveTextContent("Table 3");
   });
 
-  it("displays exact Vietnamese status labels: empty→Trống, occupied→Có khách, waiting_payment→Chờ thanh toán", () => {
+  it("displays exact status labels: empty→Available, occupied→Occupied, waiting_payment→Payment Pending", () => {
     render(
       <TableMap
         tables={tables}
@@ -66,17 +66,17 @@ describe("TableMap", () => {
       />
     );
 
-    // occupied (number 1) → Có khách
-    const btn1 = screen.getByRole("button", { name: /Bàn 1/i });
-    expect(btn1).toHaveTextContent("Có khách");
+    // occupied (number 1) → Occupied
+    const btn1 = screen.getByRole("button", { name: /Table 1/i });
+    expect(btn1).toHaveTextContent("Occupied");
 
-    // waiting_payment (number 2) → Chờ thanh toán
-    const btn2 = screen.getByRole("button", { name: /Bàn 2/i });
-    expect(btn2).toHaveTextContent("Chờ thanh toán");
+    // waiting_payment (number 2) → Payment Pending
+    const btn2 = screen.getByRole("button", { name: /Table 2/i });
+    expect(btn2).toHaveTextContent("Payment Pending");
 
-    // empty (number 3) → Trống
-    const btn3 = screen.getByRole("button", { name: /Bàn 3/i });
-    expect(btn3).toHaveTextContent("Trống");
+    // empty (number 3) → Available
+    const btn3 = screen.getByRole("button", { name: /Table 3/i });
+    expect(btn3).toHaveTextContent("Available");
   });
 
   it("calls onSelect with tableId when a table card is clicked", () => {
@@ -90,7 +90,7 @@ describe("TableMap", () => {
       />
     );
 
-    fireEvent.click(screen.getByRole("button", { name: /Bàn 1/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Table 1/i }));
     expect(onSelect).toHaveBeenCalledWith("t1");
   });
 
@@ -103,18 +103,18 @@ describe("TableMap", () => {
       />
     );
 
-    const btn2 = screen.getByRole("button", { name: /Bàn 2/i });
+    const btn2 = screen.getByRole("button", { name: /Table 2/i });
     // The selected button should have the ring class applied
     expect(btn2.className).toMatch(/ring-2/);
   });
 
-  it("exposes the empty table-map state as a Vietnamese status", () => {
+  it("exposes the empty table-map state as an accessible status", () => {
     render(
       <TableMap tables={[]} selectedTableId={null} onSelect={() => {}} />,
     );
 
     expect(
-      screen.getByRole("status", { name: "Chưa có bàn để hiển thị" }),
+      screen.getByRole("status", { name: "No tables to display" }),
     ).toBeTruthy();
     expect(screen.queryByRole("button")).toBeNull();
   });

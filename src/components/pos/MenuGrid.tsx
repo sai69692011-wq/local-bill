@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Search, Plus } from "lucide-react";
 import type { CatalogGroup, CatalogItem } from "../../../packages/pos-core/src/types";
 import { cn } from "@/lib/utils";
+import { t } from "@/lib/i18n";
 import { useOrderPaymentStore } from "../../stores/order-payment-store";
 import { useTenantAuthStore } from "../../stores/tenant-auth-store";
 import { isDexiePersistSession, persistAfterOrderEdit } from "../../pos/dexie-persist";
@@ -104,8 +105,8 @@ export function MenuGrid({ groups, items }: MenuGridProps) {
   if (orderedGroups.length === 0) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-muted-foreground">
-        <span role="status" aria-label="Chưa có món để hiển thị">
-          Chưa có món để hiển thị
+        <span role="status" aria-label="No items to display">
+          No items to display
         </span>
       </div>
     );
@@ -114,7 +115,7 @@ export function MenuGrid({ groups, items }: MenuGridProps) {
   return (
     <div className="flex h-full flex-col gap-3 p-4">
       {/* Heading */}
-      <h2 className="text-xl font-semibold text-foreground">Thực đơn</h2>
+      <h2 className="text-xl font-semibold text-foreground">{t.tabs.menu}</h2>
 
       {/* Search */}
       <div className="relative">
@@ -125,8 +126,8 @@ export function MenuGrid({ groups, items }: MenuGridProps) {
         <input
           role="searchbox"
           type="search"
-          aria-label="Tìm món"
-          placeholder="Tìm món..."
+          aria-label={t.menu.searchAria}
+          placeholder={t.menu.searchPlaceholder}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className={cn(
@@ -166,9 +167,9 @@ export function MenuGrid({ groups, items }: MenuGridProps) {
           <div
             className="flex h-full items-center justify-center py-8 text-sm text-muted-foreground"
             role="status"
-            aria-label="Không tìm thấy món nào"
+            aria-label={t.menu.noItemsStatus}
           >
-            Không tìm thấy món nào
+            {t.menu.noItemsStatus}
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">

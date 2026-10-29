@@ -7,7 +7,7 @@ describe("SetupRecovery", () => {
     const { SetupRecovery } = await import("./SetupRecovery");
     const { container } = render(<SetupRecovery onImport={async () => false} />);
     expect(container.querySelector("header")).toBeNull();
-    expect(screen.getByRole("heading", { name: "Không thể đọc dữ liệu quán" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: /Unable to read shop data/i })).toBeTruthy();
     expect(screen.queryByText("Quán Demo")).toBeNull();
     expect(screen.queryByText("0000")).toBeNull();
   });
@@ -17,7 +17,7 @@ describe("SetupRecovery", () => {
     const onImport = vi.fn(async () => true);
     render(<SetupRecovery onImport={onImport} />);
     const file = new File(["{}"], "backup.json", { type: "application/json" });
-    fireEvent.change(screen.getByLabelText("Nhập sao lưu"), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(/Import Backup/i), { target: { files: [file] } });
     await waitFor(() => expect(onImport).toHaveBeenCalledWith("{}"));
   });
 });

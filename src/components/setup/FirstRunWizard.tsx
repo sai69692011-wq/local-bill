@@ -2,6 +2,7 @@ import React, { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { t } from "@/lib/i18n";
 import type { FirstRunInput } from "@/pos/product-setup";
 
 export type FirstRunWizardProps = {
@@ -42,9 +43,9 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
     setPin("");
     try {
       const ok = await onComplete(payload);
-      if (!ok) setError("Không thể tạo quán. Kiểm tra dữ liệu rồi thử lại.");
+      if (!ok) setError(t.setup.errorMessage);
     } catch {
-      setError("Không thể tạo quán. Kiểm tra dữ liệu rồi thử lại.");
+      setError(t.setup.errorMessage);
     } finally {
       setBusy(false);
     }
@@ -55,15 +56,15 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
       <div className="w-full max-w-sm">
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
           <h1 className="mb-1 text-center text-xl font-bold text-card-foreground sm:text-2xl">
-            Thiết lập quán
+            {t.setup.heading}
           </h1>
           <p className="mb-6 text-center text-sm text-muted-foreground">
-            Tạo tên quán, bàn, và PIN 4 số chỉ trên máy này. Không dùng PIN mẫu.
+            {t.setup.subtitle}
           </p>
           <form onSubmit={handleSubmit} noValidate aria-busy={busy}>
             <div className="mb-4">
               <label htmlFor="shop-name" className="mb-1.5 block text-sm font-medium text-foreground">
-                Tên quán
+                {t.setup.shopNameLabel}
               </label>
               <Input
                 id="shop-name"
@@ -75,7 +76,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
             </div>
             <div className="mb-4">
               <label htmlFor="table-count" className="mb-1.5 block text-sm font-medium text-foreground">
-                Số bàn
+                {t.setup.tableCountLabel}
               </label>
               <Input
                 id="table-count"
@@ -91,7 +92,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
             </div>
             <div className="mb-4">
               <label htmlFor="manager-name" className="mb-1.5 block text-sm font-medium text-foreground">
-                Tên quản lý
+                {t.setup.managerNameLabel}
               </label>
               <Input
                 id="manager-name"
@@ -103,7 +104,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
             </div>
             <div className="mb-4">
               <label htmlFor="manager-pin" className="mb-1.5 block text-sm font-medium text-foreground">
-                PIN 4 số
+                {t.setup.pinLabel}
               </label>
               <Input
                 id="manager-pin"
@@ -126,7 +127,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                 disabled={busy}
                 className="h-4 w-4"
               />
-              Thêm menu mẫu
+              {t.setup.sampleMenuLabel}
             </label>
             {error && (
               <div role="alert" className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-center text-sm text-destructive">
@@ -134,7 +135,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
               </div>
             )}
             <Button type="submit" disabled={!canSubmit} aria-busy={busy} className={cn("h-11 w-full text-base font-semibold")}>
-              {busy ? "Đang tạo…" : "Tạo quán"}
+              {busy ? t.setup.submittingButton : t.setup.submitButton}
             </Button>
           </form>
         </div>
